@@ -20,7 +20,7 @@ if upfile:
     text = ""
     with pdfplumber.open(upfile) as pdf:
         for page in pdf:
-            pgtxt = page.extract_text():
+            pgtxt = page.extract_text()
             if pgtxt:
                 text += pg.txt + "\n"
     text = text.lower()
