@@ -1,7 +1,7 @@
 import streamlit as st
 import pdfplumber
 import plotly.graph_objects as go
-
+from ai_insights import generate_ai_insights
 from skills import (
     software_engineer,
     data_science,
@@ -209,6 +209,11 @@ if uploaded_file:
 
     privacy_result = analyze_privacy(text)
 
+    ai_feedback = generate_ai_insights(
+    text,
+    role
+    )
+
     match_score = analysis_result["match_score"]
 
     # -----------------------------------------------
@@ -389,6 +394,8 @@ if uploaded_file:
     # -----------------------------------------------
 
     skill_col1, skill_col2 = st.columns(2)
+    st.subheader("🤖 AI Resume Intelligence")
+    st.write(ai_feedback)
 
     with skill_col1:
 
