@@ -1,2 +1,2 @@
-STREAMLIT
-PDFPLUMBER
+streamlit
+pdfplumber
