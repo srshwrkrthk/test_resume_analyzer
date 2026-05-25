@@ -1,3 +1,5 @@
-pdfplumber
 streamlit
+pdfplumber
 plotly
+google-genai
+python-dotenv
