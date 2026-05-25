@@ -1,32 +1,35 @@
 import streamlit as st
 import pdfplumber
-import re
 
-st.title("Resume Analyzer")
-st.write("AI Powered Resume Analyzer")
-
-software_engineer_skills = [
-    "python", "java", "c++",
-    "sql", "react", "docker"
-]
-
-data_science_skills = [
-    "python", "machine learning",
-    "tensorflow", "pandas"
-]
-
-cybersecurity_skills = [
-    "linux", "nmap",
-    "wireshark", "owasp"
-]
-
-upfile = st.file_uploader(
-    "Upload Resume",
-    type=['pdf']
+from skills import (
+    software_engineer,
+    data_science,
+    cybersecurity
 )
 
+from analyzer import analyze_resume
+from privacy import analyze_privacy
+
+
+# -------------------------
+# PAGE CONFIG
+# -------------------------
+
+st.set_page_config(
+    page_title="Resume Intelligence Analyzer",
+    layout="wide"
+)
+
+st.title("Resume Intelligence Analyzer")
+st.write(
+    "AI-Powered Resume Analysis and Privacy Risk Detection"
+)
+
+
 role = st.selectbox(
+
     "Select Target Role",
+
     [
         "Software Engineer",
         "Data Science",
@@ -34,81 +37,131 @@ role = st.selectbox(
     ]
 )
 
-if upfile:
+
+uploaded_file = st.file_uploader(
+
+    "Upload Resume",
+
+    type=["pdf"]
+)
+
+
+
+if uploaded_file:
 
     text = ""
 
-    with pdfplumber.open(upfile) as pdf:
+    with pdfplumber.open(uploaded_file) as pdf:
 
         for page in pdf.pages:
 
-            pgtxt = page.extract_text()
+            extracted = page.extract_text()
 
-            if pgtxt:
-                text += pgtxt + "\n"
+            if extracted:
+                text += extracted + "\n"
 
-    text = text.lower()
-
-    empat = r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]+'
-    numpat = r'\+?\d[\d\s\-]{8,12}\d'
-
-    emails = re.findall(empat, text)
-    numbers = re.findall(numpat, text)
 
     if role == "Software Engineer":
-        required_skills = software_engineer_skills
+        role_data = software_engineer
 
     elif role == "Data Science":
-        required_skills = data_science_skills
+        role_data = data_science
 
     else:
-        required_skills = cybersecurity_skills
+        role_data = cybersecurity
 
-    found_skills = []
 
-    for skill in required_skills:
+    analysis_result = analyze_resume(
+        text,
+        role_data
+    )
 
-        if skill.lower() in text:
-            found_skills.append(skill)
+    privacy_result = analyze_privacy(text)
 
-    missing_skills = []
 
-    for skill in required_skills:
+    st.subheader("Resume Match Score")
 
-        if skill not in found_skills:
-            missing_skills.append(skill)
+    st.metric(
+        "Overall Match",
+        f"{analysis_result['match_score']}%"
+    )
 
-    total_required = len(required_skills)
-    total_found = len(found_skills)
 
-    if total_required > 0:
-        match_score = (total_found / total_required) * 100
+    st.subheader("Privacy Risk Analysis")
 
-    else:
-        match_score = 0
+    st.metric(
+        "Privacy Risk Score",
+        f"{privacy_result['privacy_score']}/100"
+    )
 
-    privacy_score = 0
+    st.write(
+        f"Risk Level: {privacy_result['risk_level']}"
+    )
 
-    if emails:
-        privacy_score += 20
 
-    if numbers:
-        privacy_score += 30
 
-    st.subheader("Match Score")
-    st.metric("Resume Match", f"{match_score:.2f}%")
+    col1, col2 = st.columns(2)
 
-    st.subheader("Privacy Score")
-    st.metric("Privacy Risk", f"{privacy_score}/100")
+    with col1:
 
-    st.subheader("Detected Emails")
-    st.write(emails)
+        st.subheader("Mandatory Skills Found")
 
-    st.subheader("Detected Phone Numbers")
-    st.write(numbers)
+        st.write(
+            analysis_result["mandatory_found"]
+        )
 
-    st.subheader("Skills Found")
-    st.write(found_skills)
+        st.subheader("Preferred Skills Found")
 
-    st.subheader("Missing Skills")
-    st.write(missing_skills)
+        st.write(
+            analysis_result["preferred_found"]
+        )
+
+    with col2:
+
+        st.subheader("Missing Mandatory Skills")
+
+        st.write(
+            analysis_result["mandatory_missing"]
+        )
+
+        st.subheader("Missing Preferred Skills")
+
+        st.write(
+            analysis_result["preferred_missing"]
+        )
+
+
+
+    st.subheader("Bonus Skills Found")
+
+    st.write(
+        analysis_result["bonus_found"]
+    )
+
+
+    st.subheader("Sensitive Information Detected")
+
+    st.write(
+        {
+            "Emails":
+            privacy_result["emails"],
+
+            "Phone Numbers":
+            privacy_result["phone_numbers"],
+
+            "LinkedIn":
+            privacy_result["linkedin"],
+
+            "GitHub":
+            privacy_result["github"],
+
+            "Aadhaar":
+            privacy_result["aadhaar"],
+
+            "PAN":
+            privacy_result["pan"],
+
+            "DOB":
+            privacy_result["dob"]
+        }
+    )
