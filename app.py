@@ -5,7 +5,25 @@ import re
 st.title("Resume Analyzer")
 st.write("AI Powered Resume Analyzer")
 
-upfile = st.file_uploader("Upload Resume", type = ['pdf'])
+software_engineer_skills = [
+    "python", "java", "c++",
+    "sql", "react", "docker"
+]
+
+data_science_skills = [
+    "python", "machine learning",
+    "tensorflow", "pandas"
+]
+
+cybersecurity_skills = [
+    "linux", "nmap",
+    "wireshark", "owasp"
+]
+
+upfile = st.file_uploader(
+    "Upload Resume",
+    type=['pdf']
+)
 
 role = st.selectbox(
     "Select Target Role",
@@ -17,21 +35,30 @@ role = st.selectbox(
 )
 
 if upfile:
+
     text = ""
+
     with pdfplumber.open(upfile) as pdf:
-        for page in pdf:
+
+        for page in pdf.pages:
+
             pgtxt = page.extract_text()
+
             if pgtxt:
-                text += pg.txt + "\n"
+                text += pgtxt + "\n"
+
     text = text.lower()
-    empat = r'[a-zA-Z0-9._-%+-]+@[a-zA-Z0-9]+\.[a-zA-Z]+'
-    numpat = r'\+?\d[\d\s\-]{8-12}\d'
-    email = re.findall(empat, text)
+
+    empat = r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]+'
+    numpat = r'\+?\d[\d\s\-]{8,12}\d'
+
+    emails = re.findall(empat, text)
     numbers = re.findall(numpat, text)
-    if role_option == "Software Engineer":
+
+    if role == "Software Engineer":
         required_skills = software_engineer_skills
 
-    elif role_option == "Data Science":
+    elif role == "Data Science":
         required_skills = data_science_skills
 
     else:
