@@ -534,86 +534,86 @@ if uploaded_file:
     # OPTIONAL AI LAYER — APP STILL WORKS IF THIS FAILS
   
     # ------------------------------------------------
-# OPTIONAL AI INSIGHTS
-# ------------------------------------------------
+    # OPTIONAL AI INSIGHTS
+    # ------------------------------------------------
 
-st.divider()
-
-st.markdown(
-    """
-    <div class="glass-card">
-        <h2>🤖 Optional AI Resume Intelligence</h2>
-        <p class="small-muted">
-            Gemini AI-generated suggestions and improvement recommendations.
-        </p>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-
-ai_feedback = None
-ai_error = None
-
-with st.spinner("Generating AI insights..."):
-
-    try:
-
-        from ai_insights import generate_ai_insights
-
-        ai_feedback = generate_ai_insights(
-            text,
-            role
-        )
-
-    except Exception as e:
-
-        ai_error = str(e)
-
-# ----------------------------------------
-# SHOW RESULTS
-# ----------------------------------------
-
-if ai_feedback:
+    st.divider()
 
     st.markdown(
-        f"""
+        """
         <div class="glass-card">
-            {ai_feedback}
+            <h2>🤖 Optional AI Resume Intelligence</h2>
+            <p class="small-muted">
+                Gemini AI-generated suggestions and improvement recommendations.
+            </p>
         </div>
         """,
         unsafe_allow_html=True
     )
 
-else:
+    ai_feedback = None
+    ai_error = None
 
-    if ai_error:
+    with st.spinner("Generating AI insights..."):
 
-        if "quota" in ai_error.lower():
+        try:
 
-            st.warning(
-                "⚠ Gemini quota exhausted. Please try again later."
+            from ai_insights import generate_ai_insights
+
+            ai_feedback = generate_ai_insights(
+                text,
+                role
             )
 
-        elif "invalid" in ai_error.lower():
+        except Exception as e:
 
-            st.error(
-                "❌ Invalid Gemini API key."
-            )
+            ai_error = str(e)
 
-        elif "model" in ai_error.lower():
+    # ----------------------------------------
+    # SHOW RESULTS
+    # ----------------------------------------
 
-            st.error(
-                "❌ Gemini model not found."
-            )
+    if ai_feedback:
 
-        else:
-
-            st.error(
-                f"AI Error: {ai_error}"
-            )
+        st.markdown(
+            f"""
+            <div class="glass-card">
+                {ai_feedback}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
     else:
 
-        st.info(
-            "AI insights unavailable."
-        )
+        if ai_error:
+
+            if "quota" in ai_error.lower():
+
+                st.warning(
+                    "⚠ Gemini quota exhausted. Please try again later."
+                )
+
+            elif "invalid" in ai_error.lower():
+
+                st.error(
+                    "❌ Invalid Gemini API key."
+                )
+
+            elif "model" in ai_error.lower():
+
+                st.error(
+                    "❌ Gemini model not found."
+                )
+
+            else:
+
+                st.error(
+                    f"AI Error: {ai_error}"
+                )
+
+        else:
+
+            st.info(
+                "AI insights unavailable."
+            )
