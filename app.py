@@ -531,11 +531,9 @@ if uploaded_file:
             )
 
     st.divider()
-    # OPTIONAL AI LAYER — APP STILL WORKS IF THIS FAILS
   
-    # ------------------------------------------------
     # OPTIONAL AI INSIGHTS
-    # ------------------------------------------------
+
 
     st.divider()
 
@@ -569,9 +567,9 @@ if uploaded_file:
 
             ai_error = str(e)
 
-    # ----------------------------------------
+
     # SHOW RESULTS
-    # ----------------------------------------
+
 
     if ai_feedback:
 
