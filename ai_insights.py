@@ -1,50 +1,52 @@
-from dotenv import load_dotenv
-import os
 from google import genai
+import streamlit as st
 
 from cache_utils import (
     get_cached_response,
     save_response_to_cache
 )
 
-load_dotenv()
-client = genai.Client(
-    api_key=st.secrets["GEMINI_API_KEY"]
-)
 
-def generate_ai_insights(
-    resume_text,
-    role
-):
+def get_api_key():
+    try:
+        return st.secrets["GEMINI_API_KEY"]
+    except Exception:
+        return None
 
-    cached = get_cached_response(
-        resume_text + role
-    )
+
+def generate_ai_insights(resume_text, role):
+    cached = get_cached_response(resume_text + role)
 
     if cached:
-
         return cached
 
+    api_key = get_api_key()
+
+    if not api_key:
+        raise Exception("GEMINI_API_KEY not found in Streamlit secrets.")
+
+    client = genai.Client(
+        api_key=api_key
+    )
+
+    limited_text = resume_text[:3000]
+
     prompt = f"""
-    You are an expert ATS resume reviewer.
+    Give concise resume feedback for a {role} role.
 
-    Analyze this resume for the role of {role}.
+    Resume:
+    {limited_text}
 
-    Resume Content:
-    {resume_text}
+    Provide:
+    - Strengths
+    - Missing Skills
+    - Improvement Suggestions
+    - Final Verdict
 
-    Give:
-    1. Strengths
-    2. Weaknesses
-    3. Missing Skills
-    4. ATS Improvement Suggestions
-    5. Final Verdict
-
-    Keep response professional and concise.
+    Keep the response under 180 words.
     """
 
     try:
-
         response = client.models.generate_content(
             model="gemini-2.5-flash",
             contents=prompt
@@ -59,9 +61,17 @@ def generate_ai_insights(
 
         return final_response
 
-    except Exception:
+    except Exception as e:
+        error_message = str(e)
 
-        return """
-AI insights temporarily unavailable.
-Please try again later.
-"""
+        if "429" in error_message or "RESOURCE_EXHAUSTED" in error_message:
+            raise Exception("Gemini quota exhausted. Please try again later.")
+
+        elif "API_KEY_INVALID" in error_message:
+            raise Exception("Invalid Gemini API key.")
+
+        elif "404" in error_message or "NOT_FOUND" in error_message:
+            raise Exception("Gemini model not found. Check model name.")
+
+        else:
+            raise Exception(f"Gemini API error: {error_message}")
