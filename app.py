@@ -531,7 +531,6 @@ if uploaded_file:
             )
 
     st.divider()
-st.write(st.secrets)
     # OPTIONAL AI LAYER — APP STILL WORKS IF THIS FAILS
   
     # ------------------------------------------------
