@@ -1,3 +1,5 @@
+from dotenv import load_dotenv
+import os
 from google import genai
 
 from cache_utils import (
@@ -5,8 +7,9 @@ from cache_utils import (
     save_response_to_cache
 )
 
+load_dotenv()
 client = genai.Client(
-    api_key="AIzaSyAs4mkokC40EKGUKWpJL14OQkl9A5lO-90"
+    api_key=st.secrets["GEMINI_API_KEY"]
 )
 
 def generate_ai_insights(
