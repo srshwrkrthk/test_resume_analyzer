@@ -249,7 +249,7 @@ st.sidebar.markdown(
     - Skill Intelligence
     - Privacy Detection
     - Weighted Matching
-    - Optional Gemini AI Insights
+    - Gemini AI Insights
     """
 )
 
@@ -348,7 +348,7 @@ if uploaded_file:
 
     role_data = roles[role]
 
-    # CORE MANUAL ANALYSIS — DOES NOT DEPEND ON AI
+    # CORE MANUAL ANALYSIS
     analysis_result = analyze_resume(text, role_data)
     privacy_result = analyze_privacy(text)
 
@@ -540,7 +540,7 @@ if uploaded_file:
     st.markdown(
         """
         <div class="glass-card">
-            <h2>🤖 Optional AI Resume Intelligence</h2>
+            <h2>🤖 AI Resume Intelligence</h2>
             <p class="small-muted">
                 Gemini AI-generated suggestions and improvement recommendations.
             </p>
@@ -589,19 +589,19 @@ if uploaded_file:
             if "quota" in ai_error.lower():
 
                 st.warning(
-                    "⚠ Gemini quota exhausted. Please try again later."
+                    "Gemini quota exhausted. Please try again later."
                 )
 
             elif "invalid" in ai_error.lower():
 
                 st.error(
-                    "❌ Invalid Gemini API key."
+                    "Invalid Gemini API key."
                 )
 
             elif "model" in ai_error.lower():
 
                 st.error(
-                    "❌ Gemini model not found."
+                    "Gemini model not found."
                 )
 
             else:
@@ -613,5 +613,5 @@ if uploaded_file:
         else:
 
             st.info(
-                "AI insights unavailable."
+                "AI insights unavailable at the moment, please try again later."
             )
